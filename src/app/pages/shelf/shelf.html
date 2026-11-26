@@ -1,0 +1,186 @@
+<main class="shelf-page">
+  <header class="topbar">
+    <a class="brand" routerLink="/home" aria-label="BookTracker - início">
+      <span>Book</span><span class="brand-highlight">Tracker</span>
+    </a>
+
+    <nav class="main-nav" aria-label="Navegação principal">
+      <a routerLink="/home" class="nav-link">Início</a>
+      <a routerLink="/livros" class="nav-link active">Minha estante</a>
+      <a routerLink="/explorar" class="nav-link">Explorar</a>
+    </nav>
+
+    <a class="profile-link" routerLink="/perfil">
+      <span class="avatar-small">AG</span>
+      <span class="profile-name">Meu perfil</span>
+    </a>
+  </header>
+
+  <section class="shelf-content">
+    <div class="page-heading">
+      <div>
+        <span class="eyebrow">SEU CANTINHO LITERÁRIO</span>
+        <h1>Minha estante</h1>
+        <p>Todos os seus livros organizados em um só lugar.</p>
+      </div>
+      <a class="add-book-button" routerLink="/explorar"><span>＋</span> Encontrar livros</a>
+    </div>
+
+    <section class="shelf-overview" aria-label="Resumo da estante">
+      <div class="overview-copy">
+        <span class="overview-label">SUA COLEÇÃO</span>
+        <strong>{{ livros.length }} <small>livros registrados</small></strong>
+        <p>Cada livro guarda um mundo. Continue construindo sua história.</p>
+      </div>
+      <div class="overview-counts">
+        @for (categoria of categorias; track categoria.status) {
+        <button
+          type="button"
+          class="overview-count"
+          [class.selected]="categoriaSelecionada() === categoria.status"
+          (click)="selecionarCategoria(categoria.status)">
+          <span class="count-number">{{ quantidade(categoria.status) }}</span>
+          <span class="count-label">{{ categoria.label }}</span>
+        </button>
+        }
+      </div>
+      <div class="shelf-decoration" aria-hidden="true">
+        <span class="decor-book decor-one"></span>
+        <span class="decor-book decor-two"></span>
+        <span class="decor-book decor-three"></span>
+      </div>
+    </section>
+
+    <section class="books-area">
+      <div class="category-tabs" role="tablist" aria-label="Categorias da estante">
+        @for (categoria of categorias; track categoria.status) {
+        <button
+          type="button"
+          role="tab"
+          class="category-tab"
+          [class.active]="categoriaSelecionada() === categoria.status"
+          [attr.aria-selected]="categoriaSelecionada() === categoria.status"
+          (click)="selecionarCategoria(categoria.status)">
+          <span>{{ categoria.label }}</span>
+          <span class="tab-count">{{ quantidade(categoria.status) }}</span>
+        </button>
+        }
+      </div>
+
+      <div class="list-toolbar">
+        <div class="list-title">
+          <div>
+            <span class="section-kicker">MINHA BIBLIOTECA</span>
+            <h2>{{ nomeCategoria(categoriaSelecionada()) }}</h2>
+            <p>
+              @for (categoria of categorias; track categoria.status) {
+              @if (categoria.status === categoriaSelecionada()) {
+              {{ categoria.description }}
+              }
+              }
+            </p>
+          </div>
+          <span class="result-count">{{ livrosFiltrados().length }} livros</span>
+        </div>
+
+        <label class="search-box">
+          <span class="search-icon">⌕</span>
+          <input
+            type="search"
+            placeholder="Buscar por título ou autor..."
+            [value]="busca()"
+            (input)="atualizarBusca($event)"
+            aria-label="Buscar livros por título ou autor" />
+          @if (busca()) {
+          <button type="button" class="clear-search" (click)="busca.set('')" aria-label="Limpar busca">×</button>
+          }
+        </label>
+      </div>
+
+      @if (livrosFiltrados().length > 0) {
+      <div class="books-list">
+        @for (book of livrosFiltrados(); track book.id) {
+        <article class="book-row">
+          <a class="book-cover-link" [routerLink]="['/livros', book.id]" [attr.aria-label]="'Ver detalhes de ' + book.title">
+            <div class="book-cover" [class]="book.coverClass">
+              <span>{{ book.title }}</span>
+            </div>
+          </a>
+
+          <div class="book-details">
+            <a class="book-title" [routerLink]="['/livros', book.id]">{{ book.title }}</a>
+            <span class="book-author">{{ book.author }}</span>
+
+            @if (book.status === 'READ') {
+            <div class="book-meta">
+              <span class="status-pill read-pill">Lido</span>
+              @if (book.finishedAt) {
+              <span>Finalizado em {{ book.finishedAt }}</span>
+              }
+              <span>{{ book.pages }} páginas</span>
+            </div>
+            } @else if (book.status === 'READING') {
+            <div class="progress-area">
+              <div class="progress-label">
+                <span class="status-pill reading-pill">Lendo</span>
+                <strong>{{ book.progress }}% concluído</strong>
+              </div>
+              <div class="progress-track">
+                <span [style.width.%]="book.progress"></span>
+              </div>
+              <small>{{ book.pages }} páginas no total</small>
+            </div>
+            } @else if (book.status === 'WISHLIST') {
+            <div class="book-meta">
+              <span class="status-pill wishlist-pill">Quero ler</span>
+              <span>{{ book.pages }} páginas</span>
+            </div>
+            } @else {
+            <div class="progress-area dropped-progress">
+              <div class="progress-label">
+                <span class="status-pill dropped-pill">Abandonado</span>
+                <strong>{{ book.progress }}% lido</strong>
+              </div>
+              <div class="progress-track">
+                <span [style.width.%]="book.progress"></span>
+              </div>
+            </div>
+            }
+          </div>
+
+          @if (book.status === 'READ' && book.rating) {
+          <div class="book-score" aria-label="Nota pessoal">
+            <span>★</span>
+            <strong>{{ book.rating }}<small>/10</small></strong>
+            <small class="score-caption">Sua nota</small>
+          </div>
+          }
+
+          <a class="details-link" [routerLink]="['/livros', book.id]" aria-label="Abrir detalhes">↗</a>
+        </article>
+        }
+      </div>
+      } @else {
+      <div class="empty-state">
+        <div class="empty-icon">📚</div>
+        <h3>{{ busca() ? 'Nenhum livro encontrado' : 'Sua lista está esperando por você' }}</h3>
+        <p>
+          {{ busca()
+          ? 'Tente buscar por outro título ou autor.'
+          : 'Adicione livros a esta categoria para começar a organizar sua estante.' }}
+        </p>
+        @if (!busca()) {
+        <a routerLink="/explorar" class="empty-action">Explorar livros</a>
+        } @else {
+        <button type="button" class="empty-action" (click)="busca.set('')">Limpar busca</button>
+        }
+      </div>
+      }
+    </section>
+
+    <footer class="shelf-footer">
+      <span>BookTracker</span>
+      <span>Organize suas leituras, guarde suas histórias.</span>
+    </footer>
+  </section>
+</main>

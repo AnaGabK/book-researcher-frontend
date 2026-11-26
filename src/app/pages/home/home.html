@@ -1,0 +1,123 @@
+<main class="home-page">
+  <header class="topbar">
+    <a class="brand" routerLink="/home" aria-label="BookTracker - início">
+      <span>Book</span><span class="brand-highlight">Tracker</span>
+    </a>
+
+    <nav class="main-nav" aria-label="Navegação principal">
+      <a routerLink="/home" class="nav-link active">Início</a>
+      <a routerLink="/livros" class="nav-link">Meus livros</a>
+      <a routerLink="/explorar" class="nav-link">Explorar</a>
+    </nav>
+
+    <a class="profile-link" routerLink="/perfil" aria-label="Acessar perfil do usuário">
+      <span class="avatar">AG</span>
+      <span class="profile-name">Meu perfil</span>
+      <span class="profile-chevron" aria-hidden="true">⌄</span>
+    </a>
+  </header>
+
+  <section class="welcome-section">
+    <div class="welcome-copy">
+      <span class="eyebrow">SEU CANTINHO LITERÁRIO</span>
+      <h1>Olá, leitor(a)! <span aria-hidden="true">♡</span></h1>
+      <p>Continue de onde parou ou encontre sua próxima história favorita.</p>
+    </div>
+
+    <div class="welcome-decoration" aria-hidden="true">
+      <span class="decoration-circle circle-one"></span>
+      <span class="decoration-circle circle-two"></span>
+      <span class="decoration-line"></span>
+      <span class="decoration-word">um capítulo de cada vez</span>
+    </div>
+  </section>
+
+  <section class="search-section" aria-label="Pesquisar livros">
+    <label class="search-box">
+      <span class="search-icon" aria-hidden="true">⌕</span>
+      <input
+        type="search"
+        placeholder="Pesquise por título, autor ou categoria..."
+        [value]="termoBusca()"
+        (input)="atualizarBusca($event)"
+        aria-label="Pesquisar por título, autor ou categoria"
+      />
+      @if (termoBusca()) {
+      <button type="button" class="clear-search" (click)="limparBusca()" aria-label="Limpar pesquisa">×</button>
+      }
+    </label>
+  </section>
+
+  <section class="books-section">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">VOLTE À SUA HISTÓRIA</span>
+        <h2> Acessados recentemente</h2>
+        <p>Seus últimos encontros com a leitura.</p>
+      </div>
+      <a routerLink="/livros/recentes" class="see-all">Ver todos <span aria-hidden="true">→</span></a>
+    </div>
+
+    @if (recentesFiltrados().length > 0) {
+    <div class="book-grid">
+      @for (book of recentesFiltrados(); track book.id) {
+      <a class="book-card" [routerLink]="['/livros', book.id]">
+        <div class="book-cover" [class]="book.coverClass">
+          <span class="cover-brand">BOOKTRACKER</span>
+          <span class="cover-title">{{ book.title }}</span>
+          <span class="cover-author">{{ book.author }}</span>
+          <span class="cover-ornament" aria-hidden="true">✳</span>
+        </div>
+        <div class="book-info">
+          <span class="book-category">{{ book.category }}</span>
+          <h3>{{ book.title }}</h3>
+          <p>{{ book.author }}</p>
+          <span class="book-meta">{{ book.accessedAt }}</span>
+        </div>
+      </a>
+      }
+    </div>
+    } @else {
+    <p class="empty-state">Nenhum livro recente encontrado para essa pesquisa.</p>
+    }
+  </section>
+
+  <section class="books-section popular-section">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">ESCOLHAS DA COMUNIDADE</span>
+        <h2>Livros populares</h2>
+        <p>Histórias que estão conquistando leitores.</p>
+      </div>
+      <a routerLink="/explorar" class="see-all">Explorar catálogo <span aria-hidden="true">→</span></a>
+    </div>
+
+    @if (popularesFiltrados().length > 0) {
+    <div class="book-grid">
+      @for (book of popularesFiltrados(); track book.id) {
+      <a class="book-card" [routerLink]="['/livros', book.id]">
+        <div class="book-cover" [class]="book.coverClass">
+          <span class="cover-brand">BOOKTRACKER</span>
+          <span class="cover-title">{{ book.title }}</span>
+          <span class="cover-author">{{ book.author }}</span>
+          <span class="cover-ornament" aria-hidden="true">✳</span>
+        </div>
+        <div class="book-info">
+          <span class="book-category">{{ book.category }}</span>
+          <h3>{{ book.title }}</h3>
+          <p>{{ book.author }}</p>
+          <span class="book-meta rating"><span aria-hidden="true">★</span> {{ book.rating }} / 5</span>
+        </div>
+      </a>
+      }
+    </div>
+    } @else {
+    <p class="empty-state">Nenhum livro popular encontrado para essa pesquisa.</p>
+    }
+  </section>
+
+  <footer class="home-footer">
+    <span>BookTracker</span>
+    <span>Organize suas leituras, guarde suas histórias.</span>
+  </footer>
+</main>

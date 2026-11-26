@@ -1,0 +1,212 @@
+<main class="detail-page">
+  <header class="topbar">
+    <a class="brand" routerLink="/home" aria-label="BookTracker - início">
+      <span>Book</span><span class="brand-highlight">Tracker</span>
+    </a>
+
+    <nav class="main-nav" aria-label="Navegação principal">
+      <a routerLink="/home" class="nav-link">Início</a>
+      <a routerLink="/livros" class="nav-link active">Meus livros</a>
+      <a routerLink="/explorar" class="nav-link">Explorar</a>
+    </nav>
+
+    <a class="profile-link" routerLink="/perfil" aria-label="Acessar perfil do usuário">
+      <span class="avatar">AG</span>
+      <span class="profile-name">Meu perfil</span>
+      <span class="profile-chevron" aria-hidden="true">⌄</span>
+    </a>
+  </header>
+
+  <div class="breadcrumb">
+    <a routerLink="/home">Início</a>
+    <span>›</span>
+    <a routerLink="/explorar">Explorar livros</a>
+    <span>›</span>
+    <span class="current-crumb">{{ livro.title }}</span>
+  </div>
+
+  <section class="book-layout">
+    <aside class="book-sidebar">
+      <div class="cover-frame">
+        @if (livro.coverUrl) {
+        <img class="book-cover-image" [src]="livro.coverUrl" [alt]="'Capa do livro ' + livro.title" />
+        } @else {
+        <div class="book-cover-placeholder">
+          <span class="cover-small">BOOKTRACKER • EDIÇÃO LITERÁRIA</span>
+          <span class="cover-decoration" aria-hidden="true">✳</span>
+          <strong>{{ livro.title }}</strong>
+          <span class="cover-author">{{ livro.author }}</span>
+          <span class="cover-year">{{ livro.publicationYear }}</span>
+        </div>
+        }
+      </div>
+
+      <div class="sidebar-tags">
+        @for (genre of livro.genres; track genre) {
+        <span class="genre-tag">{{ genre }}</span>
+        }
+      </div>
+
+      <a class="back-link" routerLink="/explorar">← Voltar para explorar</a>
+    </aside>
+
+    <div class="book-main">
+      <section class="book-heading">
+        <div>
+          <span class="eyebrow">DETALHES DO LIVRO</span>
+          <h1>{{ livro.title }}</h1>
+          <p class="original-title">{{ livro.originalTitle }}</p>
+          <p class="author-line">por <strong>{{ livro.author }}</strong></p>
+        </div>
+        <span class="edition-label">Livro</span>
+      </section>
+
+      <section class="quick-info" aria-label="Informações principais">
+        <div class="quick-info-item">
+          <span class="quick-label">PUBLICAÇÃO</span>
+          <strong>{{ livro.publicationYear }}</strong>
+        </div>
+        <div class="quick-info-item">
+          <span class="quick-label">PÁGINAS</span>
+          <strong>{{ livro.pages }}</strong>
+        </div>
+        <div class="quick-info-item">
+          <span class="quick-label">IDIOMA</span>
+          <strong>{{ livro.language }}</strong>
+        </div>
+        <div class="quick-info-item">
+          <span class="quick-label">GÊNERO</span>
+          <strong>{{ livro.genres[0] }}</strong>
+        </div>
+      </section>
+
+      <section class="list-panel">
+        <div class="panel-heading">
+          <div>
+            <span class="section-kicker">SUA ESTANTE</span>
+            <h2>Adicionar à minha lista</h2>
+          </div>
+          @if (adicionado()) {
+          <span class="saved-indicator">Na sua lista</span>
+          }
+        </div>
+
+        <div class="list-controls">
+          <label class="status-field">
+            <span>Status de leitura</span>
+            <select
+              [ngModel]="status()"
+              (ngModelChange)="status.set($event); mensagem.set('')"
+              name="status"
+            >
+              <option value="">Selecione um status</option>
+              @for (option of statusOptions; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </label>
+
+          <div class="rating-field">
+            <span class="field-label">Sua nota</span>
+            <div class="rating-options" role="group" aria-label="Nota de zero a dez">
+              @for (notaPossivel of [1,2,3,4,5,6,7,8,9,10]; track notaPossivel) {
+              <button
+                type="button"
+                class="rating-button"
+                [class.selected]="nota() === notaPossivel"
+                [attr.aria-pressed]="nota() === notaPossivel"
+                [attr.aria-label]="'Nota ' + notaPossivel"
+                (click)="selecionarNota(notaPossivel)"
+              >{{ notaPossivel }}</button>
+              }
+            </div>
+            <small>Escolha uma nota de 1 a 10</small>
+          </div>
+        </div>
+
+        <label class="notes-field">
+          <span>Suas observações <small>(opcional)</small></span>
+          <textarea
+            name="observacao"
+            rows="3"
+            [ngModel]="observacao()"
+            (ngModelChange)="observacao.set($event)"
+            placeholder="O que achou da leitura? Escreva suas impressões..."
+          ></textarea>
+        </label>
+
+        <div class="list-actions">
+          @if (adicionado()) {
+          <button type="button" class="primary-button" (click)="atualizarLista()">Salvar alterações</button>
+          <button type="button" class="remove-button" (click)="removerDaLista()">Remover da lista</button>
+          } @else {
+          <button type="button" class="primary-button" (click)="adicionarNaLista()">＋ Adicionar à minha lista</button>
+          }
+        </div>
+
+        @if (mensagem()) {
+        <p class="feedback-message" aria-live="polite">{{ mensagem() }}</p>
+        }
+      </section>
+
+      <section class="content-section synopsis-section">
+        <div class="section-heading">
+          <div>
+            <span class="section-kicker">SOBRE A OBRA</span>
+            <h2>Sinopse</h2>
+          </div>
+        </div>
+        <p class="synopsis">{{ livro.synopsis }}</p>
+      </section>
+
+      <section class="content-section">
+        <div class="section-heading">
+          <div>
+            <span class="section-kicker">FICHA TÉCNICA</span>
+            <h2>Informações do livro</h2>
+          </div>
+        </div>
+
+        <dl class="details-grid">
+          <div class="detail-item">
+            <dt>Autor(a)</dt>
+            <dd>{{ livro.author }}</dd>
+          </div>
+          <div class="detail-item">
+            <dt>Ano de publicação</dt>
+            <dd>{{ livro.publicationYear }}</dd>
+          </div>
+          <div class="detail-item">
+            <dt>Editora</dt>
+            <dd>{{ livro.publisher }}</dd>
+          </div>
+          <div class="detail-item">
+            <dt>Número de páginas</dt>
+            <dd>{{ livro.pages }}</dd>
+          </div>
+          <div class="detail-item">
+            <dt>Idioma</dt>
+            <dd>{{ livro.language }}</dd>
+          </div>
+          <div class="detail-item">
+            <dt>ISBN</dt>
+            <dd>{{ livro.isbn }}</dd>
+          </div>
+          <div class="detail-item detail-item-wide">
+            <dt>Gêneros</dt>
+            <dd class="detail-genres">
+              @for (genre of livro.genres; track genre) {
+              <span class="genre-tag">{{ genre }}</span>
+              }
+            </dd>
+          </div>
+        </dl>
+      </section>
+    </div>
+  </section>
+
+  <footer class="detail-footer">
+    <span>BookTracker</span>
+    <span>Organize suas leituras, guarde suas histórias.</span>
+  </footer>
+</main>

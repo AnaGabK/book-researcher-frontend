@@ -1,0 +1,196 @@
+<main class="profile-page">
+  <header class="topbar">
+    <a class="brand" routerLink="/home" aria-label="BookTracker - início">
+      <span>Book</span><span class="brand-highlight">Tracker</span>
+    </a>
+
+    <nav class="main-nav" aria-label="Navegação principal">
+      <a routerLink="/home" class="nav-link">Início</a>
+      <a routerLink="/livros" class="nav-link">Meus livros</a>
+      <a routerLink="/explorar" class="nav-link">Explorar</a>
+    </nav>
+
+    <a class="profile-link active-profile" routerLink="/perfil" aria-label="Perfil do usuário">
+      <span class="avatar-small">{{ iniciaisDoUsuario() }}</span>
+      <span class="profile-name">Meu perfil</span>
+    </a>
+  </header>
+
+  <div class="profile-content">
+    <aside class="profile-sidebar">
+      <section class="profile-card">
+        <div class="profile-cover"></div>
+        <div class="avatar-wrap">
+          @if (usuario.fotoUrl) {
+          <img class="profile-photo" [src]="usuario.fotoUrl" [alt]="'Foto de ' + usuario.nickname" />
+          } @else {
+          <div class="profile-photo initials-avatar">{{ iniciaisDoUsuario() }}</div>
+          }
+        </div>
+
+        <div class="profile-identity">
+          <h1>{{ usuario.nickname }}</h1>
+          <p class="real-name">{{ usuario.nome }}</p>
+          <span class="member-since">Leitor(a) desde {{ usuario.membroDesde }}</span>
+        </div>
+
+        <div class="profile-bio">
+          <span class="side-label">BIO</span>
+          <p>{{ usuario.bio }}</p>
+        </div>
+
+        <div class="profile-facts">
+          <div>
+            <span class="fact-icon">⌖</span>
+            <span>{{ usuario.localizacao }}</span>
+          </div>
+          <div>
+            <span class="fact-icon">▤</span>
+            <span>{{ livrosLidos.length }} livros lidos</span>
+          </div>
+        </div>
+
+        <a class="edit-profile" routerLink="/perfil/editar">Editar perfil</a>
+      </section>
+
+      <section class="sidebar-section">
+        <div class="sidebar-heading">
+          <h2>Amigos</h2>
+          <span>{{ amigos.length }}</span>
+        </div>
+        <div class="friends-list">
+          @for (amigo of amigos; track amigo.id) {
+          <a class="friend-row" [routerLink]="['/usuarios', amigo.id]">
+            <span class="friend-avatar" [class]="amigo.avatarClass">{{ amigo.initials }}</span>
+            <span class="friend-copy">
+                <strong>{{ amigo.nickname }}</strong>
+                <small>{{ amigo.status }}</small>
+              </span>
+            <span class="friend-dot" aria-label="Amigo"></span>
+          </a>
+          }
+        </div>
+        <a class="all-friends" routerLink="/amigos">Ver todos os amigos →</a>
+      </section>
+    </aside>
+
+    <section class="profile-main">
+      <div class="page-title-row">
+        <div>
+          <span class="eyebrow">SUA JORNADA LITERÁRIA</span>
+          <h2>Meu perfil</h2>
+          <p>Acompanhe suas leituras e descubra como sua estante está crescendo.</p>
+        </div>
+        <a class="share-profile" routerLink="/perfil/editar">Editar perfil <span>↗</span></a>
+      </div>
+
+      <section class="stats-panel">
+        <div class="stats-heading">
+          <div>
+            <span class="section-kicker">SEU HISTÓRICO</span>
+            <h3>Estatísticas de leitura</h3>
+          </div>
+          <span class="stats-period">Todos os tempos</span>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-number">{{ livrosLidos.length }}</span>
+            <span class="stat-label">Livros lidos</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">{{ totalPaginas() | number }}</span>
+            <span class="stat-label">Páginas lidas</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">{{ mediaNotas() }}</span>
+            <span class="stat-label">Nota média</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">{{ amigos.length }}</span>
+            <span class="stat-label">Amigos</span>
+          </div>
+        </div>
+
+        <div class="reading-distribution">
+          <div class="distribution-heading">
+            <strong>Minha estante</strong>
+            <span>{{ livrosLidos.length }} livros registrados</span>
+          </div>
+          <div class="distribution-bar" role="img" aria-label="Distribuição dos livros da estante">
+            <span class="bar-read" [style.width.%]="100"></span>
+          </div>
+          <div class="distribution-legend">
+            <span><i class="legend-dot read-dot"></i>Lidos <b>{{ livrosLidos.length }}</b></span>
+            <span><i class="legend-dot reading-dot"></i>Lendo <b>3</b></span>
+            <span><i class="legend-dot wishlist-dot"></i>Quero ler <b>8</b></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="books-section">
+        <div class="section-heading">
+          <div>
+            <span class="section-kicker">SUAS CONQUISTAS</span>
+            <h3>Livros já lidos</h3>
+            <p>Um pouquinho de cada mundo que você visitou.</p>
+          </div>
+          <a routerLink="/livros" class="section-link">Minha estante →</a>
+        </div>
+
+        <div class="read-books-list">
+          @for (book of livrosVisiveis; track book.id) {
+          <a class="read-book-row" [routerLink]="['/livros', book.id]">
+            <div class="mini-cover" [class]="book.coverClass">
+              <span>{{ book.title }}</span>
+            </div>
+            <div class="read-book-info">
+              <strong>{{ book.title }}</strong>
+              <span>{{ book.author }}</span>
+              <small>Finalizado em {{ book.finishedAt }} · {{ book.pages }} páginas</small>
+            </div>
+            <div class="book-rating">
+              <span>★</span>
+              <strong>{{ book.rating }}/10</strong>
+            </div>
+          </a>
+          }
+        </div>
+
+        <button type="button" class="show-more" (click)="alternarLivros()">
+          {{ mostrarTodos() ? 'Mostrar menos' : 'Ver todos os livros lidos' }}
+          <span>{{ mostrarTodos() ? '↑' : '→' }}</span>
+        </button>
+      </section>
+
+      <section class="books-section favorites-section">
+        <div class="section-heading">
+          <div>
+            <span class="section-kicker">OS QUE FICARAM COM VOCÊ</span>
+            <h3>Meus favoritos</h3>
+            <p>Livros que receberam nota máxima.</p>
+          </div>
+          <a routerLink="/livros/favoritos" class="section-link">Ver favoritos →</a>
+        </div>
+
+        <div class="favorite-grid">
+          @for (book of favoritos; track book.id) {
+          <a class="favorite-card" [routerLink]="['/livros', book.id]">
+            <div class="favorite-cover" [class]="book.coverClass">
+              <span>{{ book.title }}</span>
+            </div>
+            <strong>{{ book.title }}</strong>
+            <small>{{ book.author }}</small>
+            <span class="favorite-rating">★★★★★</span>
+          </a>
+          }
+        </div>
+      </section>
+
+      <footer class="profile-footer">
+        <span>BookTracker</span>
+        <span>Organize suas leituras, guarde suas histórias.</span>
+      </footer>
+    </section>
+  </div>
+</main>

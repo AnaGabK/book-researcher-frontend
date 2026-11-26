@@ -1,0 +1,95 @@
+<main class="login-page">
+  <section class="login-card" aria-label="Login BookTracker">
+    <aside class="brand-panel">
+      <a class="brand-name" routerLink="/" aria-label="BookTracker - página inicial">
+        <span>Book</span><span class="brand-highlight">Tracker</span>
+      </a>
+
+      <span class="brand-divider" aria-hidden="true"></span>
+
+      <p>
+        Registre seus livros,<br />
+        acompanhe sua leitura<br />
+        e descubra novas histórias.
+      </p>
+    </aside>
+
+    <section class="form-panel">
+      <div class="form-content">
+        <header class="form-header">
+          <h1>Bem-vindo(a)!</h1>
+          <p>Faça login para continuar <span class="heart" aria-hidden="true">♡</span></p>
+        </header>
+
+        <form [formGroup]="loginForm" (ngSubmit)="entrar()" novalidate>
+          <div class="field-group">
+            <label for="email">E-mail</label>
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="seuemail@exemplo.com"
+              autocomplete="email"
+              [class.invalid]="loginForm.controls.email.touched && loginForm.controls.email.invalid"
+            />
+            @if (loginForm.controls.email.touched && loginForm.controls.email.hasError('required')) {
+            <small class="field-error">Informe seu e-mail.</small>
+            } @else if (loginForm.controls.email.touched && loginForm.controls.email.hasError('email')) {
+            <small class="field-error">Informe um e-mail válido.</small>
+            }
+          </div>
+
+          <div class="field-group">
+            <label for="senha">Senha</label>
+            <div class="password-wrapper">
+              <input
+                id="senha"
+                [type]="mostrarSenha ? 'text' : 'password'"
+                formControlName="senha"
+                placeholder="Digite sua senha"
+                autocomplete="current-password"
+                [class.invalid]="loginForm.controls.senha.touched && loginForm.controls.senha.invalid"
+              />
+              <button
+                class="password-toggle"
+                type="button"
+                (click)="mostrarSenha = !mostrarSenha"
+                [attr.aria-label]="mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'"
+              >
+                {{ mostrarSenha ? 'Ocultar' : 'Mostrar' }}
+              </button>
+            </div>
+            @if (loginForm.controls.senha.touched && loginForm.controls.senha.hasError('required')) {
+            <small class="field-error">Informe sua senha.</small>
+            } @else if (loginForm.controls.senha.touched && loginForm.controls.senha.hasError('minlength')) {
+            <small class="field-error">A senha deve ter pelo menos 6 caracteres.</small>
+            }
+          </div>
+
+          <div class="form-options">
+            <label class="remember-option">
+              <input type="checkbox" formControlName="lembrar" />
+              <span>Lembrar de mim</span>
+            </label>
+
+            <a routerLink="/recuperar-senha" class="text-link">Esqueceu sua senha?</a>
+          </div>
+
+          <button class="primary-button" type="submit">Entrar <span aria-hidden="true">→</span></button>
+        </form>
+
+        <div class="separator"><span>ou</span></div>
+
+        <button class="google-button" type="button" (click)="entrarComGoogle()">
+          <span class="google-mark" aria-hidden="true">G</span>
+          Entrar com Google
+        </button>
+
+        <p class="register-prompt">
+          Ainda não tem uma conta?
+          <a routerLink="/cadastro" class="text-link">Cadastre-se <span aria-hidden="true">→</span></a>
+        </p>
+      </div>
+    </section>
+  </section>
+</main>
